@@ -1,56 +1,63 @@
 import telebot  
 from telebot import types
-from db import User
+from db import User, Task
+
 
 TOKEN = "6057584842:AAFLA0OfZhxQvcjTPpBgC7-IQTxp_iKWP1g"
 
 bot = telebot.TeleBot(TOKEN)
 
 
-
-
-
-
 @bot.message_handler(commands=['start'])
 def start_record(message):
 
-    global user
-    user = User(message.from_user.id,message.from_user.username)
-    user.insert_user()
+    user = User(message.from_user.id,message.from_user.username,message.date)
 
 
+    # if not user.check_db_for_user():
+    #     user.insert_user()
+
+    # creating buttons after start 
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
-
     markup.add(types.KeyboardButton('Add task'))
     markup.add(types.KeyboardButton('Remove task'))
     markup.add(types.KeyboardButton('Edit task'))
+    markup.add(types.KeyboardButton('Show tasks'))
 
+    # greating user
     bot.send_message(
         message.chat.id,
         f"Hi {message.from_user.first_name},\nI was made to help your task managment!"
         ,reply_markup = markup)
 
+
+# buttons effects 
 @bot.message_handler(content_types='text')
-def message_reply(message):
-    if message.text=="Add task":
-         bot.send_message(message.chat.id,"bip-bip")
+def handle_message(message):
 
-
-
-
-
-
-
-
-@bot.message_handler(func = lambda m: True)
-def results_save(message):
-    bot.send_message(message, message.text)
+    user = User(tel_id = message.from_user.id, 
+                user_name = message.from_user.username, 
+                log_time = message.date)
     
+    if message.text == "Add task":
+        bot.send_message(message.chat.id, "bip-bip for Add task")
 
-@bot.message_handler(commands=['text'])
-def record_task(message):
-    user.insert_task(message.text,"10:08:2001")
+    elif message.text == "Remove task":
+        bot.send_message(message.chat.id, "bip-bip for Remove task")
     
+    elif message.text == "Edit task":
+        bot.send_message(message.chat.id, "bip-bip for Edit task")
+    
+    elif message.text == "Show tasks":
+        bot.send_message(message.chat.id, "bip-bip for Show task")
+    
+    else:
+        bot.send_message(message.chat.id, "I do not even know what to say...")
+
+
+
+
+
 
 
 
