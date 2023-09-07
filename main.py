@@ -35,6 +35,7 @@ def handle_message(message):
     
     if message.text == "Add task":
         bot.send_message(message.chat.id, "bip-bip for Add task")
+        task = Task()
         
     elif message.text == "Remove task":
         bot.send_message(message.chat.id, "bip-bip for Remove task")

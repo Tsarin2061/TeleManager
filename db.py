@@ -7,10 +7,12 @@ class User:
         self.user_name = user_name
         self.db_connection = self._connect_db()
         self.log_time = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+        
         # automaticaly called during initiation of class
         self._create_db()
         self._insert_user()
         self._load_logtime()
+        self.status = self._get_status()
 
 
     def _connect_db(self):
@@ -22,6 +24,7 @@ class User:
                 id INTEGER PRIMARY KEY,
                 telegram_id INTEGER,
                 user_name TEXT,
+                status TEXT,
                 log_time TEXT
             )
         '''
@@ -40,8 +43,8 @@ class User:
 
     def _insert_user(self):
         if self.check_db_for_user() == False:
-            query = "INSERT INTO users (telegram_id, user_name) VALUES (?, ?)"
-            self._execute_query(query, (self.tel_id, self.user_name))
+            query = "INSERT INTO users (telegram_id, user_name, status) VALUES (?, ?,?)"
+            self._execute_query(query, (self.tel_id, self.user_name,"Start"))
         else:
             pass
 
@@ -61,6 +64,10 @@ class User:
         else:
             return False
         
+
+    def _get_status(self):
+        query = "SELECT status FROM users WHERE telegram_id = ?"
+        return self._execute_query(query,(self.tel_id,))
 
     def close_db_connection(self):
         self.db_connection.close()
@@ -99,6 +106,7 @@ class Task(User):
             return result[0]
         else:
             return 0
+        
 
     def insert_task(self,user_id, task_note, data_time):
         last_task_id = self._get_last_task_id()
