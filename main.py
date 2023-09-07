@@ -11,13 +11,8 @@ bot = telebot.TeleBot(TOKEN)
 @bot.message_handler(commands=['start'])
 def start_record(message):
 
-    user = User(message.from_user.id,message.from_user.username,message.date)
+    user = User(message.from_user.id,message.from_user.username)
 
-
-    # if not user.check_db_for_user():
-    #     user.insert_user()
-
-    # creating buttons after start 
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
     markup.add(types.KeyboardButton('Add task'))
     markup.add(types.KeyboardButton('Remove task'))
@@ -36,12 +31,11 @@ def start_record(message):
 def handle_message(message):
 
     user = User(tel_id = message.from_user.id, 
-                user_name = message.from_user.username, 
-                log_time = message.date)
+                user_name = message.from_user.username)
     
     if message.text == "Add task":
         bot.send_message(message.chat.id, "bip-bip for Add task")
-
+        
     elif message.text == "Remove task":
         bot.send_message(message.chat.id, "bip-bip for Remove task")
     

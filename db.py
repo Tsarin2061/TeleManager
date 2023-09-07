@@ -1,14 +1,12 @@
 import sqlite3
-import pytz
-import datetime
+from datetime import datetime
 
 class User:
-    def __init__(self,tel_id, user_name,log_time):
+    def __init__(self,tel_id, user_name):
         self.tel_id = tel_id
         self.user_name = user_name
         self.db_connection = self._connect_db()
-        self.log_time = log_time
-
+        self.log_time = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
         # automaticaly called during initiation of class
         self._create_db()
         self._insert_user()
@@ -48,11 +46,9 @@ class User:
             pass
 
     def _load_logtime(self):
-        time_of_login = pytz.timezone('Europe/Kiev').localize(datetime.datetime.fromtimestamp(self.log_time))
-        formatted_time = time_of_login.strftime("%Y-%m-%d %H:%M:%S")
         if self.check_db_for_user():
             query = "UPDATE users SET log_time = ? WHERE telegram_id = ?"
-        self._execute_query(query, (formatted_time,self.tel_id))
+        self._execute_query(query, (self.log_time, self.tel_id))
 
 
 
