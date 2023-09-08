@@ -11,9 +11,8 @@ def main_keyboard():
 
 def edit_keyboard():
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
-    markup.add(types.KeyboardButton('Change title'))
-    markup.add(types.KeyboardButton('Change notes'))
-    markup.add(types.KeyboardButton('Change date&time'))
+    markup.add(types.KeyboardButton('Change description'))
+    markup.add(types.KeyboardButton('Change deadline'))
     markup.add(types.KeyboardButton('Main menu'))
     return markup
     

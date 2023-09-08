@@ -26,12 +26,11 @@ def start_record(message):
 
 # Define a dictionary to map commands to actions
 commands = {
-    "Add task": ("adding task", "Describe your task!",None),
-    "Remove task": ("removing task", "bip-bip for Remove task",None),
-    "Edit task": ("editing task", "bip-bip for Edit task", edit_keyboard()),
-    "Change title": ("changing title", "bip-bip titlechanging", None),  # Special case
-    "Change date&time":("changing date", "bip-bip date changing", None), # under editing task
-    "Change notes": ("changing notes", "bip-bip notes changing", None),  # Special case
+    "Add task": ("adding task", "Describe your task.",None),
+    "Remove task": ("removing task", "Please provide the task ID for removal.",None),
+    "Edit task": ("editing task", "To edit a task, please provide the task ID.", None),
+    "Change deadline":("changing deadline", "Please provide the new task deadline (e.g., 10/08/2023 22:30)", None), 
+    "Description": ("changing description", "bip-bip notes changing", None), 
     "Show tasks": ("showing tasks", "Your tasks bip-bip list:",None),
     "Main menu" : ("Start", "bip-bip for returning back", main_keyboard())
 }
@@ -52,8 +51,7 @@ def handle_message(message):
             for id,note,date in task.get_users_task():
                 bot.send_message(message.chat.id,f"№:{id}\nDescription: {note}\nDeadline: {date}")
                 
-
-    # Here we add task
+    # Here we uses subprocesses
     elif user.status == 'adding task':
         user.change_status('adding task deadline')
         task.add_description(text)
@@ -62,6 +60,21 @@ def handle_message(message):
         task.add_deadline(text)
         bot.send_message(message.chat.id, "Done!\nBip-bip..")
         user.change_status('Start')
+    elif user.status == 'removing task':
+        to_remove = int(text)
+        task.remove_users_task(to_remove)
+        bot.send_message(message.chat.id, f"The task #{to_remove} has been successfully removed.\nBip-bip")
+    elif user.status == 'editing task':
+        global to_edit # sorry Kostik, I had no choice...
+        to_edit = int(text)
+        if to_edit:
+            bot.send_message(message.chat.id, 'Select what would you like to edit',reply_markup = edit_keyboard())
+    elif user.status == 'changing deadline':
+        new_deadline = text
+        task.update_deadline(task_id=to_edit,new_date=new_deadline)
+        bot.send_message(message.chat.id,f"The deadline for task #{to_edit} has been updated to {new_deadline}.")
+    elif user.status == 'changing description':
+        pass
     else:
         bot.send_message(message.chat.id, "I do not even know what to say...")
 

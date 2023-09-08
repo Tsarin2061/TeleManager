@@ -159,9 +159,18 @@ class Task(User):
         return tasks
     
     def remove_users_task(self, task_id):
-        query = "DELETE FROM tasks WHERE id = ? AND user_id = ?"
+        query = "DELETE FROM tasks WHERE task_id = ? AND user_id = ?"
         self._execute_query(query, (task_id, self.user_id))
         pass    
+
+    def update_deadline(self,task_id,new_date):
+        query = "UPDATE tasks SET data_time = ? WHERE user_id = ? AND task_id = ?"
+        self._execute_query(query,(new_date,self.user_id,task_id))
+        pass
+
+    def update_description():
+        pass
+
     
 
         
