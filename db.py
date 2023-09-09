@@ -1,6 +1,7 @@
 import sqlite3
 from datetime import datetime
 
+
 class User:
     def __init__(self, tel_id, user_name):
         self.tel_id = tel_id
@@ -68,7 +69,9 @@ class User:
     
     def change_status(self,status):
         query = "UPDATE users SET status = ? WHERE telegram_id = ?"
+        query_log_time = "UPDATE users SET log_time = ? WHERE telegram_id = ?"
         self._execute_query(query,(status,self.tel_id))
+        self._execute_query(query_log_time,(self.log_time,self.tel_id))
 
     def close_db_connection(self):
         self.db_connection.close()
@@ -87,8 +90,8 @@ class Task(User):
 
 
     def add_description(self, description):
-        query = 'INSERT INTO tasks (task_note, user_id) VALUES (?,?)'
-        self._execute_query(query, (description,self.user_id))
+        query = 'INSERT INTO tasks (task_note, user_id,status) VALUES (?,?,?)'
+        self._execute_query(query, (description,self.user_id,"active"))
     
 
     def add_deadline(self,deadline):
@@ -133,8 +136,17 @@ class Task(User):
                 data_time TEXT,
                 status TEXT,
                 FOREIGN KEY (user_id) REFERENCES users (id)
-            )
+            );
         '''
+        query_editor_tasks = '''
+            CREATE TABLE IF NOT EXISTS task_editor (
+                editor_id INTEGER,
+                to_edit_id INTEGER,
+                FOREIGN KEY (editor_id) REFERENCES users (id),
+                FOREIGN KEY (to_edit_id) REFERENCES users (id)
+            );
+        '''
+        self._execute_query(query_editor_tasks)
         self._execute_query(query_tasks)
 
 
@@ -168,7 +180,15 @@ class Task(User):
         self._execute_query(query,(new_date,self.user_id,task_id))
         pass
 
-    def update_description():
+    def update_description(self,task_id,new_description):
+        query = "UPDATE tasks SET task_note = ? WHERE user_id = ? AND task_id = ?"
+        self._execute_query(query,(new_description,self.user_id,task_id))
+        pass
+
+    def update_status(self,task_id,new_status):
+        query = "UPDATE tasks SET status = ? WHERE user_id = ? AND task_id = ?"
+
+        self._execute_query(query,(new_status,self.user_id,task_id))
         pass
 
     

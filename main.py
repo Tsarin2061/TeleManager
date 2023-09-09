@@ -1,8 +1,8 @@
 import telebot  
-from telebot import types
 from db import User, Task
 from keyboard import main_keyboard, edit_keyboard
-
+from threading import Timer
+from functions import extract_date
 
 TOKEN = "6057584842:AAFLA0OfZhxQvcjTPpBgC7-IQTxp_iKWP1g"
 
@@ -48,9 +48,11 @@ def handle_message(message):
 
         # in case command could be executed straightforward
         if text == "Show tasks":
+            i = 1
             for id,note,date in task.get_users_task():
-                bot.send_message(message.chat.id,f"№:{id}\nDescription: {note}\nDeadline: {date}")
-                
+                bot.send_message(message.chat.id,f"№:{i}\nDescription: {note}\nDeadline: {date}")
+                i+=1
+
     # Here we uses subprocesses
     elif user.status == 'adding task':
         user.change_status('adding task deadline')
@@ -74,11 +76,23 @@ def handle_message(message):
         task.update_deadline(task_id=to_edit,new_date=new_deadline)
         bot.send_message(message.chat.id,f"The deadline for task #{to_edit} has been updated to {new_deadline}.")
     elif user.status == 'changing description':
-        pass
+        new_task = text
+        for id,note,date in task.get_users_task():
+            if to_edit == id:
+                bot.send_message(message.chat.id,f"Here's the current task description:\n{note}")
+                task.update_description(task_id=to_edit,new_description=text)
     else:
         bot.send_message(message.chat.id, "I do not even know what to say...")
 
-
-
+def send_reminder():
+    info = extract_date()
+    if info:
+        task = Task(info['telegram_id'])
+        bot.send_message(info['telegram_id'],f"Hey,a gentle reminder regarding your task:\n{info['task']}")
+        task.update_status(task_id=info["task_id"], new_status='inactive')
+    else:
+        pass
+    Timer(5,send_reminder).start()
+Timer(5,send_reminder).start()
 
 bot.infinity_polling()
