@@ -41,8 +41,8 @@ class User:
 
     def __insert_user(self):
         if self.check_db_for_user() == False:
-            query = "INSERT INTO users (telegram_id, user_name, status) VALUES (?, ?,?)"
-            self._execute_query(query, (self.tel_id, self.user_name,"Start"))
+            query = "INSERT INTO users (telegram_id, user_name, status,log_time) VALUES (?, ?,?)"
+            self._execute_query(query, (self.tel_id, self.user_name,"Start",self.log_time))
         else:
             pass
 

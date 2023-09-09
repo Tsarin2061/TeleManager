@@ -80,7 +80,7 @@ def handle_message(message):
         for id,note,date in task.get_users_task():
             if to_edit == id:
                 bot.send_message(message.chat.id,f"Here's the current task description:\n{note}")
-                task.update_description(task_id=to_edit,new_description=text)
+                task.update_description(task_id=to_edit,new_description=new_task)
     else:
         bot.send_message(message.chat.id, "I do not even know what to say...")
 
