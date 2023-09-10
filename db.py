@@ -89,10 +89,10 @@ class User:
         query = "SELECT to_edit_id FROM task_editor WHERE editor_id = ?"
         id = self._execute_query(query,(self.id,))
         check = id.fetchone()
-        query = "DELETE FROM task_editor WHERE editor_id = ?"
-        self._execute_query(query,(self.id,))
+        query2 = "DELETE FROM task_editor WHERE editor_id = ?"
         if check:
             reuslts = check[0]
+            self._execute_query(query2,(self.id,))
             return str(reuslts)
 
     def close_db_connection(self):

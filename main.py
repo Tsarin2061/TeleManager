@@ -104,8 +104,8 @@ def handle_message(message):
             bot.send_message(message.chat.id, "Please provide a valid ID")
     elif user.status == "changing deadline":
         i = 1
+        id_edit = user.pop_task()
         for id_task, note, date in task.get_users_task():
-            id_edit = user.pop_task()
             if i == int(id_edit):
                 processed_date = process_date(text)
                 task.update_deadline(task_id=id_task, new_date=processed_date)
@@ -116,13 +116,14 @@ def handle_message(message):
             i += 1
     elif user.status == "changing description":
         i = 1
+        id_edit = user.pop_task()
         for id_task, note, date in task.get_users_task():
-            id_edit = user.pop_task()
             if i == int(id_edit):
                 bot.send_message(
                     message.chat.id, f"The description for task #{i} has been updated to:\n{text}"
                 )
-                task.update_description(task_id=id_edit, new_description=text)
+                task.update_description(task_id=id_task, new_description=text)
+            i += 1
     else:
         bot.send_message(message.chat.id, "I do not even know what to say...")
 
