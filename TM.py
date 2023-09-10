@@ -141,9 +141,8 @@ def send_reminder():
             f"Hey,a gentle reminder regarding your task:\n{info['task']}",
         )
         task.update_status(task_id=info["task_id"], new_status="inactive")
-        Timer(5, send_reminder).start()
-    else:
-        Timer(5, send_reminder).start()
-Timer(5, send_reminder).start()
+    Timer(2, send_reminder).start()
+
+Timer(2, send_reminder).start()
 
 bot.infinity_polling()

@@ -13,16 +13,21 @@ def extract_date():
     cursor = db.cursor()
 
     try:
-        get_id = "SELECT telegram_id FROM users WHERE id = (SELECT user_id FROM tasks WHERE data_time = ?)"
+        get_id = 'SELECT telegram_id FROM users WHERE id = (SELECT user_id FROM tasks WHERE data_time = ? and status = "active" LIMIT 1)'
+        
         cursor.execute(get_id, (current_time,))
         tel_id = cursor.fetchone()[0]
+        print(tel_id)
         # Get the date and task based on the telegram_id and current_time
         get_task = '''SELECT data_time, task_note, task_id
                     FROM tasks WHERE user_id = 
                     (SELECT id FROM users WHERE telegram_id = ?)
                     AND data_time = ? AND status = "active"'''
-        cursor.execute(get_task, (tel_id, current_time))
+        cursor.execute(get_task, (tel_id, current_time,))
+
+        print(cursor.fetchone)
         date, task, task_id = cursor.fetchone()
+
         return {
         "telegram_id": tel_id,
         "task_id":task_id,
