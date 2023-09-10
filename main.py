@@ -34,7 +34,7 @@ commands = {
         "Please provide the new task deadline (e.g., 10/08/2023 22:30)",
         None,
     ),
-    "Description": ("changing description", "bip-bip notes changing", None),
+    "Change description": ("changing description", "Please generate a new description for your task.", None),
     "Show tasks": ("showing tasks", "Your tasks bip-bip list:", None),
     "Main menu": ("Start", "bip-bip for returning back", main_keyboard()),
 }
@@ -115,13 +115,14 @@ def handle_message(message):
                 )
             i += 1
     elif user.status == "changing description":
-        new_task = text
-        for id, note, date in task.get_users_task():
-            if to_edit == id:
+        i = 1
+        for id_task, note, date in task.get_users_task():
+            id_edit = user.pop_task()
+            if i == int(id_edit):
                 bot.send_message(
-                    message.chat.id, f"Here's the current task description:\n{note}"
+                    message.chat.id, f"The description for task #{i} has been updated to:\n{text}"
                 )
-                task.update_description(task_id=to_edit, new_description=new_task)
+                task.update_description(task_id=id_edit, new_description=text)
     else:
         bot.send_message(message.chat.id, "I do not even know what to say...")
 
