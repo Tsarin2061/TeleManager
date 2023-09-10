@@ -12,8 +12,7 @@ bot = telebot.TeleBot(TOKEN)
 
 @bot.message_handler(commands=["start"])
 def start_record(message):
-    """Responsible for greating user
-    """
+    """Responsible for greating user"""
     User(message.from_user.id, message.from_user.username)
     markup = main_keyboard()
     # greating user
@@ -34,7 +33,11 @@ commands = {
         "Please provide the new task deadline (e.g., 10/08/2023 22:30)",
         None,
     ),
-    "Change description": ("changing description", "Please generate a new description for your task.", None),
+    "Change description": (
+        "changing description",
+        "Please generate a new description for your task.",
+        None,
+    ),
     "Show tasks": ("showing tasks", "Your tasks bip-bip list:", None),
     "Main menu": ("Start", "bip-bip for returning back", main_keyboard()),
 }
@@ -42,8 +45,7 @@ commands = {
 
 @bot.message_handler(content_types=["text"])
 def handle_message(message):
-    """Responsible for responding to user queries
-    """
+    """Responsible for responding to user queries"""
     user = User(tel_id=message.from_user.id, user_name=message.from_user.username)
     text = message.text
     task = Task(message.from_user.id)
@@ -120,7 +122,8 @@ def handle_message(message):
         for id_task, note, date in task.get_users_task():
             if i == int(id_edit):
                 bot.send_message(
-                    message.chat.id, f"The description for task #{i} has been updated to:\n{text}"
+                    message.chat.id,
+                    f"The description for task #{i} has been updated to:\n{text}",
                 )
                 task.update_description(task_id=id_task, new_description=text)
             i += 1
@@ -129,8 +132,7 @@ def handle_message(message):
 
 
 def send_reminder():
-    """Creates the query to database every 5 second
-    """
+    """Creates the query to database every 5 second"""
     info = extract_date()
     if info:
         task = Task(info["telegram_id"])
@@ -139,10 +141,9 @@ def send_reminder():
             f"Hey,a gentle reminder regarding your task:\n{info['task']}",
         )
         task.update_status(task_id=info["task_id"], new_status="inactive")
+        Timer(5, send_reminder).start()
     else:
-        pass
-    Timer(5, send_reminder).start()
-
+        Timer(5, send_reminder).start()
 Timer(5, send_reminder).start()
 
 bot.infinity_polling()
