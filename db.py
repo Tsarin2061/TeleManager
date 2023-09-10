@@ -12,6 +12,7 @@ class User:
         self._create_db()
         self.__insert_user()
         self.status = self.__get_status()
+        self.id = self.__get_id_from_db()
 
 
     def _connect_db(self):
@@ -41,10 +42,17 @@ class User:
 
     def __insert_user(self):
         if self.check_db_for_user() == False:
-            query = "INSERT INTO users (telegram_id, user_name, status,log_time) VALUES (?, ?,?)"
+            query = "INSERT INTO users (telegram_id, user_name, status,log_time) VALUES (?,?,?,?)"
             self._execute_query(query, (self.tel_id, self.user_name,"Start",self.log_time))
         else:
             pass
+
+    def __get_id_from_db(self):
+        query = "SELECT id FROM users WHERE telegram_id = ?"
+        id = self._execute_query(query,(self.tel_id,))
+        id_user = id.fetchone()
+        if id_user:
+            return id_user[0]
 
 
     def check_db_for_user(self):
@@ -73,9 +81,22 @@ class User:
         self._execute_query(query,(status,self.tel_id))
         self._execute_query(query_log_time,(self.log_time,self.tel_id))
 
+    def mark_edit_task(self,id_task):
+        query = "INSERT INTO task_editor (editor_id, to_edit_id) VALUES(?, ?)"
+        self._execute_query(query,(self.id,id_task))
+
+    def pop_task(self):
+        query = "SELECT to_edit_id FROM task_editor WHERE editor_id = ?"
+        id = self._execute_query(query,(self.id,))
+        check = id.fetchone()
+        query = "DELETE FROM task_editor WHERE editor_id = ?"
+        self._execute_query(query,(self.id,))
+        if check:
+            reuslts = check[0]
+            return str(reuslts)
+
     def close_db_connection(self):
         self.db_connection.close()
-
 
 
 

@@ -15,9 +15,7 @@ def start_record(message):
     """Responsible for greating user
     """
     User(message.from_user.id, message.from_user.username)
-
     markup = main_keyboard()
-
     # greating user
     bot.send_message(
         message.chat.id,
@@ -93,21 +91,29 @@ def handle_message(message):
                 )
             i += 1
     elif user.status == "editing task":
-        global to_edit  # sorry Kostik, I had no choice...
-        to_edit = int(text)
-        if to_edit:
-            bot.send_message(
-                message.chat.id,
-                "Select what would you like to edit",
-                reply_markup=edit_keyboard(),
-            )
+        try:
+            to_edit = int(text)
+            if to_edit:
+                user.mark_edit_task(to_edit)
+                bot.send_message(
+                    message.chat.id,
+                    "Select what would you like to edit",
+                    reply_markup=edit_keyboard(),
+                )
+        except:
+            bot.send_message(message.chat.id, "Please provide a valid ID")
     elif user.status == "changing deadline":
-        new_deadline = text
-        task.update_deadline(task_id=to_edit, new_date=new_deadline)
-        bot.send_message(
-            message.chat.id,
-            f"The deadline for task #{to_edit} has been updated to {new_deadline}.",
-        )
+        i = 1
+        for id_task, note, date in task.get_users_task():
+            id_edit = user.pop_task()
+            if i == int(id_edit):
+                processed_date = process_date(text)
+                task.update_deadline(task_id=id_task, new_date=processed_date)
+                bot.send_message(
+                    message.chat.id,
+                    f"The deadline for task #{i} has been updated to {processed_date}.",
+                )
+            i += 1
     elif user.status == "changing description":
         new_task = text
         for id, note, date in task.get_users_task():
