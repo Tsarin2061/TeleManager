@@ -187,7 +187,6 @@ class Task(User):
 
     def update_status(self,task_id,new_status):
         query = "UPDATE tasks SET status = ? WHERE user_id = ? AND task_id = ?"
-
         self._execute_query(query,(new_status,self.user_id,task_id))
         pass
 

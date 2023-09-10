@@ -1,6 +1,6 @@
-from datetime import datetime
+from datetime import datetime,timedelta
 import sqlite3
-from threading import Timer
+import re
 
 def extract_date():
     """extracts data from DB 
@@ -34,3 +34,29 @@ def extract_date():
         db.close()
 
         return False
+    
+
+def process_date(date):
+    present_date = datetime.now()
+    tomorrow_day = present_date + timedelta(1)
+
+    if re.match(r'\d{2}:\d{2}',date):
+        formatted_today = re.sub(r'\d{2}:\d{2}', f"{present_date.strftime('%d/%m/%Y')} {date}", date)
+        # Convert the formatted_today string into a datetime object
+        formatted_today_datetime = datetime.strptime(formatted_today, "%d/%m/%Y %H:%M")
+        # Compare with the current date and time
+        if present_date > formatted_today_datetime:
+            return re.sub(r'\d{2}:\d{2}', f"{tomorrow_day.strftime('%d/%m/%Y')} {date}", date)
+        else: 
+            return formatted_today_datetime.strftime("%d/%m/%Y %H:%M")
+    elif re.match(r'\d{2}[./\\]\d{2}\s*\d{2}:\d{2}',date):
+        date_parts = date.split()
+        if len(date_parts) >= 2:
+            day = date_parts[0]
+            time = date_parts[1]
+            date_str = re.sub(r'[./\\]', '/', day)
+            formatted_date = f"{date_str}/{present_date.strftime('%Y')} {time}"
+            formatted_date_datetime = datetime.strptime(formatted_date,"%d/%m/%Y %H:%M").strftime("%d/%m/%Y %H:%M")
+            return formatted_date_datetime
+    else:
+        return date
