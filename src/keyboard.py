@@ -9,6 +9,12 @@ def main_keyboard():
     markup.add(types.KeyboardButton('Show tasks'))
     return markup
 
+def collab_question_keyboard():
+    pass
+
+def remind_question_keyboard():
+    pass
+
 def edit_keyboard():
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
     markup.add(types.KeyboardButton('Change description'))

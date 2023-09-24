@@ -17,7 +17,7 @@ def extract_date():
         
         cursor.execute(get_id, (current_time,))
         tel_id = cursor.fetchone()[0]
-        print(tel_id)
+        
         # Get the date and task based on the telegram_id and current_time
         get_task = '''SELECT data_time, task_note, task_id
                     FROM tasks WHERE user_id = 
@@ -25,7 +25,6 @@ def extract_date():
                     AND data_time = ? AND status = "active"'''
         cursor.execute(get_task, (tel_id, current_time,))
 
-        print(cursor.fetchone)
         date, task, task_id = cursor.fetchone()
 
         return {

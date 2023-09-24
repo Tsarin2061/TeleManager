@@ -1,8 +1,9 @@
 from threading import Timer
 import telebot
-from db import User, Task
-from keyboard import main_keyboard, edit_keyboard
-from functions import extract_date, process_date
+from src.task import Task
+from src.user import User
+from src.keyboard import main_keyboard, edit_keyboard
+from src.functions import extract_date, process_date
 
 
 TOKEN = "6057584842:AAFLA0OfZhxQvcjTPpBgC7-IQTxp_iKWP1g"
@@ -24,8 +25,10 @@ def start_record(message):
 
 
 # Define a dictionary to map commands to actions
+# New features start from here 
 commands = {
     "Add task": ("adding task", "Describe your task.", None),
+    "Add collaborators": ("adding collaborators", "Do you want to notify other people?", None),
     "Remove task": ("removing task", "Please provide the task ID for removal.", None),
     "Edit task": ("editing task", "To edit a task, please provide the task ID.", None),
     "Change deadline": (
@@ -76,8 +79,13 @@ def handle_message(message):
         try:
             task.add_deadline(process_date(text))
             bot.send_message(message.chat.id, "Done!\nBip-bip..")
+            user.change_status("Start")
         except:
             bot.send_message(message.chat.id, "Provide valid date!")
+
+    elif user.status == "adding collaborator":
+        pass
+
     elif user.status == "removing task":
         try:
             to_remove = int(text)
@@ -92,6 +100,9 @@ def handle_message(message):
                     f"The task #{i} has been successfully removed.\nBip-bip",
                 )
             i += 1
+
+        user.change_status("Start")
+
     elif user.status == "editing task":
         try:
             to_edit = int(text)
@@ -104,6 +115,7 @@ def handle_message(message):
                 )
         except:
             bot.send_message(message.chat.id, "Please provide a valid ID")
+
     elif user.status == "changing deadline":
         i = 1
         id_edit = user.pop_task()
@@ -114,8 +126,11 @@ def handle_message(message):
                 bot.send_message(
                     message.chat.id,
                     f"The deadline for task #{i} has been updated to {processed_date}.",
+                    reply_markup = main_keyboard()
                 )
             i += 1
+        user.change_status("Start")
+
     elif user.status == "changing description":
         i = 1
         id_edit = user.pop_task()
@@ -124,9 +139,12 @@ def handle_message(message):
                 bot.send_message(
                     message.chat.id,
                     f"The description for task #{i} has been updated to:\n{text}",
+                    reply_markup = main_keyboard()
                 )
                 task.update_description(task_id=id_task, new_description=text)
             i += 1
+        user.change_status("Start")
+
     else:
         bot.send_message(message.chat.id, "I do not even know what to say...")
 
