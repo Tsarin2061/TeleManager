@@ -182,13 +182,12 @@ def send_reminder():
             f"Hey,a gentle reminder regarding your task:\n{info['task']}",
         )
         task.update_status(task_id=info["task_id"], new_status="inactive")
-        # if info['collaborator']:
-        #     print('it is')
-        #     bot.send_message(
-        #     info["collaborator_id"],
-        #     f"Hey, your friend @{NONE}:\n{info['task']}",
-        #     )
-        #     pass
+        if info['collaborator_id']:
+            bot.send_message(
+            info["collaborator_id"],
+            f"Hey, your friend @{info['user_name']} created a task:\n{info['task']}",
+            )
+            pass
         task.update_status(task_id=info["task_id"], new_status="inactive")
     Timer(2, send_reminder).start()
 

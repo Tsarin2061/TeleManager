@@ -13,25 +13,30 @@ def extract_date():
     cursor = db.cursor()
 
     try:
-        get_id = 'SELECT telegram_id FROM users WHERE id = (SELECT user_id FROM tasks WHERE data_time = ? and status = "active" LIMIT 1)'
+        get_id = 'SELECT telegram_id, user_name FROM users WHERE id = (SELECT user_id FROM tasks WHERE data_time = ? and status = "active" LIMIT 1)'
         
         cursor.execute(get_id, (current_time,))
-        tel_id = cursor.fetchone()[0]
+        tel_id,tel_user_name = cursor.fetchone()
         
         # Get the date and task based on the telegram_id and current_time
-        get_task = '''SELECT data_time, task_note, task_id
+        get_task = '''SELECT data_time, task_note, task_id, collaborators_id
                     FROM tasks WHERE user_id = 
                     (SELECT id FROM users WHERE telegram_id = ?)
                     AND data_time = ? AND status = "active"'''
         cursor.execute(get_task, (tel_id, current_time,))
 
-        date, task, task_id = cursor.fetchone()
+        date, task, task_id, collaborators_username = cursor.fetchone()
 
+        get_user_id = '''SELECT telegram_id FROM users WHERE user_name = ?'''
+        cursor.execute(get_user_id,(collaborators_username,))
+        collaborators_id = cursor.fetchone()[0]
         return {
+        "user_name": tel_user_name,
         "telegram_id": tel_id,
         "task_id":task_id,
         "date": date,
-        "task": task
+        "task": task,
+        "collaborator_id":collaborators_id
     }
     except:
         db.commit()
