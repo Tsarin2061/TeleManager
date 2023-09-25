@@ -15,7 +15,7 @@ class User(DataBase):
         self.id = self.__get_id_from_db()
 
     def __insert_user(self):
-        if self.check_db_for_user() == False:
+        if self.check_user_in_db('telegram_id', self.tel_id) == False:
             query = "INSERT INTO users (telegram_id, user_name, status,log_time) VALUES (?,?,?,?)"
             self._execute_query(query, (self.tel_id, self.user_name,"Start",self.log_time))
         else:
@@ -29,14 +29,16 @@ class User(DataBase):
             return id_user[0]
 
 
-    def check_db_for_user(self):
-        query = "SELECT * FROM users WHERE telegram_id = ?"
-        pseudo_cursor = self._execute_query(query, (self.tel_id,))
-        if pseudo_cursor.fetchone():
-            return True
+    def check_user_in_db(self, field, value):
+        if field == 'telegram_id':
+            query = "SELECT * FROM users WHERE telegram_id = ?"
+        elif field == 'user_name':
+            query = "SELECT * FROM users WHERE user_name = ?"
         else:
-            return False
-        
+            raise ValueError("Invalid field name")
+
+        pseudo_cursor = self._execute_query(query, (value,))
+        return pseudo_cursor.fetchone() is not None       
 
     def __get_status(self):
         query = "SELECT status FROM users WHERE telegram_id = ?"

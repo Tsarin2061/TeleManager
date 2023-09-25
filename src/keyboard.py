@@ -10,7 +10,11 @@ def main_keyboard():
     return markup
 
 def collab_question_keyboard():
-    pass
+    markup = types.InlineKeyboardMarkup()
+    markup.row_width = 2
+    markup.add(types.InlineKeyboardButton("Yes", callback_data="cb_yes"),
+                               types.InlineKeyboardButton("No", callback_data="cb_no"))
+    return markup
 
 def remind_question_keyboard():
     pass

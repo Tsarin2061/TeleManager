@@ -1,8 +1,9 @@
+from pickle import NONE
 from threading import Timer
 import telebot
 from src.task import Task
 from src.user import User
-from src.keyboard import main_keyboard, edit_keyboard
+from src.keyboard import main_keyboard, edit_keyboard, collab_question_keyboard
 from src.functions import extract_date, process_date
 
 
@@ -79,12 +80,23 @@ def handle_message(message):
         try:
             task.add_deadline(process_date(text))
             bot.send_message(message.chat.id, "Done!\nBip-bip..")
+            bot.send_message(message.chat.id, "do want notify a friend?",reply_markup = collab_question_keyboard())
             user.change_status("Start")
+
         except:
             bot.send_message(message.chat.id, "Provide valid date!")
 
     elif user.status == "adding collaborator":
-        pass
+        usrname = str(text).replace('@','')
+        if user.check_user_in_db("user_name",usrname):
+            task.add_collaborator(usrname)
+            bot.send_message(message.chat.id, f"User {text} will be notified")
+            user.change_status("Start")
+        else:
+            bot.send_message(message.chat.id, f"User {text} is not found")
+
+
+
 
     elif user.status == "removing task":
         try:
@@ -149,6 +161,17 @@ def handle_message(message):
         bot.send_message(message.chat.id, "I do not even know what to say...")
 
 
+@bot.callback_query_handler(func=lambda call: True)
+def call_back_query(call):
+    # adding a collab call_back
+    if call.data == "cb_yes":
+        bot.send_message(call.message.chat.id,"Provide a valid username of your friend in telegram\n(e.g. @prosto_kostik)")
+        user = User(tel_id=call.from_user.id, user_name=call.from_user.username)
+        user.change_status("adding collaborator")
+    elif call.data == "cb_no":
+        bot.answer_callback_query(call.id, "Okay then")
+    pass
+
 def send_reminder():
     """Creates the query to database every 5 second"""
     info = extract_date()
@@ -158,6 +181,14 @@ def send_reminder():
             info["telegram_id"],
             f"Hey,a gentle reminder regarding your task:\n{info['task']}",
         )
+        task.update_status(task_id=info["task_id"], new_status="inactive")
+        # if info['collaborator']:
+        #     print('it is')
+        #     bot.send_message(
+        #     info["collaborator_id"],
+        #     f"Hey, your friend @{NONE}:\n{info['task']}",
+        #     )
+        #     pass
         task.update_status(task_id=info["task_id"], new_status="inactive")
     Timer(2, send_reminder).start()
 

@@ -20,10 +20,10 @@ class Task(DataBase):
         query = "UPDATE tasks SET data_time = ? WHERE user_id = ? AND task_id = ?"
         self._execute_query(query,(deadline,self.user_id,task_id))
 
-    def add_collaborator(self,colab_id):
+    def add_collaborator(self,colab_username):
         task_id = self.__get_last_task_id()
         query = "UPDATE tasks SET collaborators_id = ? WHERE user_id = ? AND task_id = ?"
-        self._execute_query(query,(colab_id,self.user_id,task_id))
+        self._execute_query(query,(colab_username,self.user_id,task_id))
 
 
     def __load_id(self,id):
@@ -45,6 +45,7 @@ class Task(DataBase):
         else:
             return 0
     
+
 
     def _load_description(self):
         query = "SELECT "
