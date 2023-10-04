@@ -7,7 +7,7 @@ from src.keyboard import main_keyboard, edit_keyboard, collab_question_keyboard
 from src.functions import extract_date, process_date
 
 
-TOKEN = "6057584842:AAFLA0OfZhxQvcjTPpBgC7-IQTxp_iKWP1g"
+TOKEN = "6601407772:AAG-0XB94Zx3-9Bm69gDVmx9YuJRKDGKzQQ"
 
 bot = telebot.TeleBot(TOKEN)
 
@@ -88,9 +88,10 @@ def handle_message(message):
 
     elif user.status == "adding collaborator":
         usrname = str(text).replace('@','')
+        usrname = usrname.replace(' ', '').strip()
         if user.check_user_in_db("user_name",usrname):
             task.add_collaborator(usrname)
-            bot.send_message(message.chat.id, f"User {text} will be notified")
+            bot.send_message(message.chat.id, f"{text} will be notified")
             user.change_status("Start")
         else:
             bot.send_message(message.chat.id, f"User {text} is not found")
@@ -174,20 +175,33 @@ def call_back_query(call):
 
 def send_reminder():
     """Creates the query to database every 5 second"""
+    print('it is running')
     info = extract_date()
-    if info:
+    print(info)
+    if type(info) == dict:
+        print('info is')
+        print(info["telegram_id"])
         task = Task(info["telegram_id"])
         bot.send_message(
             info["telegram_id"],
             f"Hey,a gentle reminder regarding your task:\n{info['task']}",
         )
         task.update_status(task_id=info["task_id"], new_status="inactive")
-        if info['collaborator_id']:
-            bot.send_message(
-            info["collaborator_id"],
-            f"Hey, your friend @{info['user_name']} created a task:\n{info['task']}",
-            )
-            pass
+        if info['collaborator_id'] is not None:
+
+            if type(info['collaborator_id']) == list:
+                for name in info['collaborator_id']:
+                    print(f"collab name{name}")
+                    bot.send_message(
+                    name,
+                    f"Hey, your friend @{info['user_name']} created a task:\n{info['task']}",
+                    )
+            else:
+                bot.send_message(
+                info["collaborator_id"],
+                f"Hey, your friend @{info['user_name']} created a task:\n{info['task']}",
+                )
+                pass
         task.update_status(task_id=info["task_id"], new_status="inactive")
     Timer(2, send_reminder).start()
 

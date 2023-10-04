@@ -16,7 +16,8 @@ def extract_date():
         get_id = 'SELECT telegram_id, user_name FROM users WHERE id = (SELECT user_id FROM tasks WHERE data_time = ? and status = "active" LIMIT 1)'
         
         cursor.execute(get_id, (current_time,))
-        tel_id,tel_user_name = cursor.fetchone()
+        tel_id,tel_user_name= cursor.fetchone()[0:2]
+
         
         # Get the date and task based on the telegram_id and current_time
         get_task = '''SELECT data_time, task_note, task_id, collaborators_id
@@ -25,23 +26,33 @@ def extract_date():
                     AND data_time = ? AND status = "active"'''
         cursor.execute(get_task, (tel_id, current_time,))
 
-        date, task, task_id, collaborators_username = cursor.fetchone()
+        date, task, task_id, collaborators_username = cursor.fetchone()[0:5]
 
         get_user_id = '''SELECT telegram_id FROM users WHERE user_name = ?'''
-        cursor.execute(get_user_id,(collaborators_username,))
-        collaborators_id = cursor.fetchone()[0]
+        list_coll = []
+        if type(collaborators_username) == list:
+            for name in collaborators_username.split(','):
+                print(name)
+                cursor.execute(get_user_id,(name,))
+                collaborators_id = cursor.fetchone()[0]
+                list_coll.append(collaborators_id)
+        else:
+            cursor.execute(get_user_id,(collaborators_username,))
+            collaborators_id = cursor.fetchone()[0]
         return {
         "user_name": tel_user_name,
         "telegram_id": tel_id,
         "task_id":task_id,
         "date": date,
         "task": task,
-        "collaborator_id":collaborators_id
+        "collaborator_id":list_coll
     }
-    except:
-        db.commit()
-        db.close()
-
+    except Exception as e:
+        print(f"error: {e}")
+        # db.commit()
+        # db.close()
+    except sqlite3.Error as e:
+        print(f"error: {e}")
         return False
     
 

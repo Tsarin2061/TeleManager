@@ -30,10 +30,25 @@ class User(DataBase):
 
 
     def check_user_in_db(self, field, value):
+        # we use it internaly
         if field == 'telegram_id':
             query = "SELECT * FROM users WHERE telegram_id = ?"
+        
+        # used externaly
         elif field == 'user_name':
-            query = "SELECT * FROM users WHERE user_name = ?"
+
+            array = value.split(',')
+            if type(array) == list:
+                for name in array:
+                    query = "SELECT * FROM users WHERE user_name = ?"
+                    pseudo_cursor = self._execute_query(query, (name.replace("@",''),))
+                    if pseudo_cursor.fetchone() is not None:
+                        pass
+                    else:
+                        return False
+                return True
+            else:
+                query = "SELECT * FROM users WHERE user_name = ?"
         else:
             raise ValueError("Invalid field name")
 
