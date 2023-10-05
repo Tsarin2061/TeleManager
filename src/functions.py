@@ -30,7 +30,7 @@ def extract_date():
 
         get_user_id = '''SELECT telegram_id FROM users WHERE user_name = ?'''
         list_coll = []
-        if type(collaborators_username) == list:
+        if type(collaborators_username.split(',')) == list:
             for name in collaborators_username.split(','):
                 print(name)
                 cursor.execute(get_user_id,(name,))
@@ -39,6 +39,7 @@ def extract_date():
         else:
             cursor.execute(get_user_id,(collaborators_username,))
             collaborators_id = cursor.fetchone()[0]
+            list_coll.append(collaborators_id)
         return {
         "user_name": tel_user_name,
         "telegram_id": tel_id,

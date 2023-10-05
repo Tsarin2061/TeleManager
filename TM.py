@@ -188,7 +188,7 @@ def send_reminder():
         )
         task.update_status(task_id=info["task_id"], new_status="inactive")
         if info['collaborator_id'] is not None:
-
+            print(info["collaborator_id"])
             if type(info['collaborator_id']) == list:
                 for name in info['collaborator_id']:
                     print(f"collab name{name}")
