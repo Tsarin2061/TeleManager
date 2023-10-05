@@ -32,7 +32,6 @@ def extract_date():
         list_coll = []
         if type(collaborators_username.split(',')) == list:
             for name in collaborators_username.split(','):
-                print(name)
                 cursor.execute(get_user_id,(name,))
                 collaborators_id = cursor.fetchone()[0]
                 list_coll.append(collaborators_id)
@@ -49,12 +48,8 @@ def extract_date():
         "collaborator_id":list_coll
     }
     except Exception as e:
-        print(f"error: {e}")
-        # db.commit()
-        # db.close()
-    except sqlite3.Error as e:
-        print(f"error: {e}")
         return False
+
     
 
 def process_date(date):

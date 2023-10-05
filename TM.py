@@ -175,12 +175,8 @@ def call_back_query(call):
 
 def send_reminder():
     """Creates the query to database every 5 second"""
-    print('it is running')
     info = extract_date()
-    print(info)
     if type(info) == dict:
-        print('info is')
-        print(info["telegram_id"])
         task = Task(info["telegram_id"])
         bot.send_message(
             info["telegram_id"],
@@ -188,10 +184,8 @@ def send_reminder():
         )
         task.update_status(task_id=info["task_id"], new_status="inactive")
         if info['collaborator_id'] is not None:
-            print(info["collaborator_id"])
             if type(info['collaborator_id']) == list:
                 for name in info['collaborator_id']:
-                    print(f"collab name{name}")
                     bot.send_message(
                     name,
                     f"Hey, your friend @{info['user_name']} created a task:\n{info['task']}",
