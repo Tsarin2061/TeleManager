@@ -7,7 +7,7 @@ from src.keyboard import main_keyboard, edit_keyboard, collab_question_keyboard
 from src.functions import extract_date, process_date
 
 
-TOKEN = "6601407772:AAG-0XB94Zx3-9Bm69gDVmx9YuJRKDGKzQQ"
+TOKEN = "6057584842:AAFLA0OfZhxQvcjTPpBgC7-IQTxp_iKWP1g"
 
 bot = telebot.TeleBot(TOKEN)
 
