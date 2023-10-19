@@ -1,5 +1,6 @@
 # here I try to reimplement class DB as it should have looked like
 import sqlite3
+import logging
 
 class DataBase():
     def __init__(self) -> None:
@@ -42,6 +43,8 @@ class DataBase():
         self._execute_query(query_editor_tasks)
         self._execute_query(query_tasks)
         self._execute_query(query_users)
+        logging.INFO(f"Created 3 DBs")
+
     
     def _execute_query(self, query, params=None):
         conn = self.db_connection

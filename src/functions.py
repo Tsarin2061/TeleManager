@@ -1,8 +1,10 @@
 from datetime import datetime,timedelta
 import sqlite3
 import re
+import logging
 
 def extract_date():
+    logging.debug("Extracting function entered")
     """extracts data from DB 
 
     Returns:
@@ -48,8 +50,35 @@ def extract_date():
         "collaborator_id":list_coll
     }
     except Exception as e:
+        logging.error(f"Ecountered an error {e}")
         return False
+# def extract_date():
+#     """extracts data from DB 
 
+#     Returns:
+#         dictionary : returns dict with telegram id of user, task notes and date
+#     """
+#     current_time = datetime.now().strftime("%d/%m/%Y %H:%M")
+#     db = sqlite3.connect('tasks.db')
+#     cursor = db.cursor()
+
+#     try:
+#         query = 'SELECT users.telegram_id, users.user_name, tasks.task_id, tasks.task_note, tasks.data_time, tasks.collaborators_id FROM tasks JOIN users ON tasks.user_id=users.id WHERE tasks.data_time = ? AND tasks.status = "active" LIMIT 1;'
+#         cursor.execute(query, (current_time,))
+#         tel_id, tel_user_name, task_id, task, date, collaborators_username = cursor.fetchone()
+#         query = f'SELECT id FROM users WHERE user_name IN ({collaborators_username});'
+#         cursor.execute(query)
+#         list_coll = [item[0] for item in cursor.fetchall()]
+#         return {
+#         "user_name": tel_user_name,
+#         "telegram_id": tel_id,
+#         "task_id":task_id,
+#         "date": date,
+#         "task": task,
+#         "collaborator_id":list_coll
+#     }
+#     except Exception as e:
+#         return False
     
 
 def process_date(date):

@@ -1,6 +1,7 @@
 import sqlite3
 from datetime import datetime
 from src.newdb import DataBase
+import logging
 
 class Task(DataBase):
 
@@ -12,15 +13,19 @@ class Task(DataBase):
 
 
     def add_description(self, description):
+        logging.DEBUG('Adding task')
         query = 'INSERT INTO tasks (task_note, user_id,status) VALUES (?,?,?)'
         self._execute_query(query, (description,self.user_id,"active"))
     
     def add_deadline(self,deadline):
+        logging.DEBUG('Adding deadline')
+
         task_id = self.__get_last_task_id()
         query = "UPDATE tasks SET data_time = ? WHERE user_id = ? AND task_id = ?"
         self._execute_query(query,(deadline,self.user_id,task_id))
 
     def add_collaborator(self,colab_username):
+        logging.DEBUG('Adding collaborator')
         task_id = self.__get_last_task_id()
         query = "UPDATE tasks SET collaborators_id = ? WHERE user_id = ? AND task_id = ?"
         self._execute_query(query,(colab_username,self.user_id,task_id))
@@ -46,7 +51,7 @@ class Task(DataBase):
             return 0
     
 
-
+    # I have no idea what was idea of creatin this
     def _load_description(self):
         query = "SELECT "
         try:
@@ -84,6 +89,7 @@ class Task(DataBase):
     
 
     def remove_users_task(self, task_id):
+        logging.debug("Remove task")
         query = "DELETE FROM tasks WHERE task_id = ? AND user_id = ?"
         self._execute_query(query, (task_id, self.user_id))
         pass    

@@ -1,6 +1,7 @@
 import sqlite3
 from datetime import datetime
 from src.newdb import DataBase
+import logging
 
 class User(DataBase):
     def __init__(self, tel_id, user_name):
@@ -15,6 +16,7 @@ class User(DataBase):
         self.id = self.__get_id_from_db()
 
     def __insert_user(self):
+        logging.INFO("New user detected")
         if self.check_user_in_db('telegram_id', self.tel_id) == False:
             query = "INSERT INTO users (telegram_id, user_name, status,log_time) VALUES (?,?,?,?)"
             self._execute_query(query, (self.tel_id, self.user_name,"Start",self.log_time))
@@ -26,6 +28,7 @@ class User(DataBase):
         id = self._execute_query(query,(self.tel_id,))
         id_user = id.fetchone()
         if id_user:
+            logging.debug('Receiving user telegram_id from db')
             return id_user[0]
 
 
@@ -33,10 +36,10 @@ class User(DataBase):
         # we use it internaly
         if field == 'telegram_id':
             query = "SELECT * FROM users WHERE telegram_id = ?"
-        
+            logging.debug(f"Checking whether user already in db by telegram_id")
         # used externaly
         elif field == 'user_name':
-
+            logging.debug(f"Checking whether user already in db by username")
             array = value.split(',')
             if type(array) == list:
                 for name in array:
@@ -71,12 +74,16 @@ class User(DataBase):
         query_log_time = "UPDATE users SET log_time = ? WHERE telegram_id = ?"
         self._execute_query(query,(status,self.tel_id))
         self._execute_query(query_log_time,(self.log_time,self.tel_id))
+        logging.debug(f"Changign the status to {status}")
+
 
     def mark_edit_task(self,id_task):
+        logging.debug("Marking task to edit")
         query = "INSERT INTO task_editor (editor_id, to_edit_id) VALUES(?, ?)"
         self._execute_query(query,(self.id,id_task))
 
     def pop_task(self):
+        logging.debug("Deleting the task")
         query = "SELECT to_edit_id FROM task_editor WHERE editor_id = ?"
         id = self._execute_query(query,(self.id,))
         check = id.fetchone()

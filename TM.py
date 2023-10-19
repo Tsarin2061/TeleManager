@@ -5,11 +5,13 @@ from src.task import Task
 from src.user import User
 from src.keyboard import main_keyboard, edit_keyboard, collab_question_keyboard
 from src.functions import extract_date, process_date
+import logging
 
-
-TOKEN = "6057584842:AAFLA0OfZhxQvcjTPpBgC7-IQTxp_iKWP1g"
+TOKEN = "6601407772:AAG-0XB94Zx3-9Bm69gDVmx9YuJRKDGKzQQ"
 
 bot = telebot.TeleBot(TOKEN)
+
+logging.basicConfig(level=logging.INFO, filename="TaskManager.log",filemode="w")
 
 
 @bot.message_handler(commands=["start"])
@@ -177,6 +179,7 @@ def send_reminder():
     """Creates the query to database every 5 second"""
     info = extract_date()
     if type(info) == dict:
+        logging.info("FOUND TASK TO SEND!")
         task = Task(info["telegram_id"])
         bot.send_message(
             info["telegram_id"],
@@ -185,12 +188,15 @@ def send_reminder():
         task.update_status(task_id=info["task_id"], new_status="inactive")
         if info['collaborator_id'] is not None:
             if type(info['collaborator_id']) == list:
+                logging.debug("SEND MESSAGE TO LIST OF COLABORATORS")
                 for name in info['collaborator_id']:
+                    
                     bot.send_message(
                     name,
                     f"Hey, your friend @{info['user_name']} created a task:\n{info['task']}",
                     )
             else:
+                logging.debug("SEND MESSAGE TO ONE COLABORATOR")
                 bot.send_message(
                 info["collaborator_id"],
                 f"Hey, your friend @{info['user_name']} created a task:\n{info['task']}",
